@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U1-05 · Dibuja un dígito: la regresión logística en el navegador · IFCD48</title>
+<link rel="stylesheet" href="../estilo.css">
+<style>
+.zona{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin:10px 0}
+#lienzo{border:1px solid #9AA5B1;touch-action:none;background:#fff;cursor:crosshair;width:280px;height:280px}
+#mini{border:1px solid #CFE0F2;width:112px;height:112px;image-rendering:pixelated}
+.barras{flex:1;min-width:240px}
+.fila{display:flex;align-items:center;gap:8px;margin:3px 0;font-variant-numeric:tabular-nums}
+.fila span:first-child{width:14px;font-weight:700}
+.b{height:16px;background:#7FA7D6}
+.fila.top .b{background:#1F5FA8}
+.fila span:last-child{width:52px;text-align:right;font-size:14px}
+#resp{font-size:22px;font-weight:700;color:#1F5FA8;margin:6px 0}
+.nota{font-size:14px;color:#555}
+</style>
+</head>
+<body>
+<header><div class="cod">IFCD48 · Unidad 1 · U1-05 · Explora</div>
+<h1>Dibuja un dígito: la regresión logística en el navegador</h1></header>
+<main>
+<p>Dibuja un dígito del 0 al 9 con el ratón o con el dedo. La página lo reduce a 28 × 28 píxeles,
+como las imágenes de MNIST, y lo clasifica con la regresión logística del apartado 1.7: los
+mismos 7850 parámetros, que aciertan el 92,6 % de las imágenes de prueba de MNIST.</p>
+<div class="zona">
+<div>
+<canvas id="lienzo" width="280" height="280" aria-label="Zona de dibujo"></canvas>
+<p><button type="button" id="borrar">Borrar</button></p>
+</div>
+<div>
+<p style="margin:0 0 4px">Lo que ve el modelo:</p>
+<canvas id="mini" width="28" height="28"></canvas>
+<p id="resp">Dibuja un dígito</p>
+</div>
+<div class="barras" id="barras"></div>
+</div>
+<p class="nota">La página prepara el dibujo como se prepararon las imágenes de MNIST: lo encaja en un
+cuadro de 20 × 20 píxeles y lo centra por su centro de masas en una imagen de 28 × 28. Aun así, un
+dibujo hecho con el ratón no se parece del todo a la escritura con bolígrafo de MNIST, así que
+espera más errores que el 7,4 % de la prueba. Prueba a escribir un 4 abierto y uno cerrado, o un 7
+con y sin rayita: ¿cuáles confunde? La red con una capa oculta de la sección 1.10 se equivoca
+bastante menos.</p>
+</main>
+<footer>Recurso complementario del libro <em>Programación de Redes Neuronales - Machine Learning</em> (IFCD48). Datos de entrenamiento: MNIST (Y. LeCun, C. Cortes y C. J. C. Burges, CC BY-SA 3.0).</footer>
+<script>
+const L=document.getElementById('lienzo'),c=L.getContext('2d'),M=document.getElementById('mini'),mc=M.getContext('2d');
+let modelo=null,dibujando=false,ultimo=null;
+fetch('logistica_mnist.json').then(r=>r.json()).then(j=>{modelo=j;pintarBarras(null)});
+function limpiar(){c.fillStyle='#fff';c.fillRect(0,0,280,280);mc.fillStyle='#fff';mc.fillRect(0,0,28,28);
+  document.getElementById('resp').textContent='Dibuja un dígito';pintarBarras(null)}
+limpiar();
+function pos(e){const r=L.getBoundingClientRect();return[(e.clientX-r.left)*280/r.width,(e.clientY-r.top)*280/r.height]}
+L.addEventListener('pointerdown',e=>{dibujando=true;ultimo=pos(e);L.setPointerCapture(e.pointerId)});
+L.addEventListener('pointermove',e=>{if(!dibujando)return;const p=pos(e);c.strokeStyle='#000';c.lineWidth=20;c.lineCap='round';c.lineJoin='round';
+  c.beginPath();c.moveTo(...ultimo);c.lineTo(...p);c.stroke();ultimo=p});
+L.addEventListener('pointerup',()=>{dibujando=false;clasificar()});
+document.getElementById('borrar').onclick=limpiar;
+function a28(){
+  const d=c.getImageData(0,0,280,280).data;let x0=280,y0=280,x1=-1,y1=-1;
+  for(let y=0;y<280;y++)for(let x=0;x<280;x++)if(d[(y*280+x)*4]<128){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return null;
+  const w=x1-x0+1,h=y1-y0+1,esc=20/Math.max(w,h);
+  const t=document.createElement('canvas');t.width=28;t.height=28;const tc=t.getContext('2d');
+  tc.fillStyle='#fff';tc.fillRect(0,0,28,28);tc.imageSmoothingEnabled=true;
+  tc.drawImage(L,x0,y0,w,h,(28-w*esc)/2,(28-h*esc)/2,w*esc,h*esc);
+  let px=tc.getImageData(0,0,28,28).data,v=new Float32Array(784),sx=0,sy=0,s=0;
+  for(let i=0;i<784;i++){v[i]=1-px[i*4]/255;s+=v[i];sx+=v[i]*(i%28);sy+=v[i]*Math.floor(i/28)}
+  const dx=Math.round(14-sx/s),dy=Math.round(14-sy/s),u=new Float32Array(784);
+  for(let y=0;y<28;y++)for(let x=0;x<28;x++){const xx=x-dx,yy=y-dy;if(xx>=0&&xx<28&&yy>=0&&yy<28)u[y*28+x]=v[yy*28+xx]}
+  return u}
+function clasificar(){
+  if(!modelo)return;const x=a28();if(!x)return;
+  const img=mc.createImageData(28,28);for(let i=0;i<784;i++){const g=255-Math.round(x[i]*255);img.data.set([g,g,g,255],i*4)}mc.putImageData(img,0,0);
+  const z=modelo.W.map((w,k)=>w.reduce((s,wi,i)=>s+wi*x[i],modelo.b[k])),m=Math.max(...z),e=z.map(v=>Math.exp(v-m)),S=e.reduce((a,b)=>a+b,0),p=e.map(v=>v/S);
+  const k=p.indexOf(Math.max(...p));
+  document.getElementById('resp').textContent='Parece un '+k+' ('+(100*p[k]).toLocaleString('es-ES',{maximumFractionDigits:0})+' %)';
+  pintarBarras(p)}
+function pintarBarras(p){const B=document.getElementById('barras');let s='<p style="margin:0 0 4px">Probabilidad de cada dígito:</p>';
+  const k=p?p.indexOf(Math.max(...p)):-1;
+  for(let d=0;d<10;d++){const v=p?p[d]:0;s+=`<div class="fila${d===k?' top':''}"><span>${d}</span><div class="b" style="width:${(v*180).toFixed(0)}px"></div><span>${(100*v).toLocaleString('es-ES',{maximumFractionDigits:1})} %</span></div>`}
+  B.innerHTML=s}
+</script>
+</body>
+</html>

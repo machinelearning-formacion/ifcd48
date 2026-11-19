@@ -1,0 +1,45 @@
+name: Publicar recursos en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 6 1 * *"   # el día 1 de cada mes: comprueba que todo sigue construyendo
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar dependencias (versiones fijadas)
+        run: pip install -r requirements.txt tensorflow==2.21.0
+      - name: Comprobar que los notebooks se ejecutan
+        run: |
+          for nb in contenido/notebooks/*/*.ipynb contenido/colab/*/*.ipynb; do
+            jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=python3 --stdout "$nb" > /dev/null
+          done
+      - name: Borrar los archivos que generan los notebooks al ejecutarse
+        run: git clean -fdx contenido
+      - name: Construir la web
+        run: python herramientas/construir.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  desplegar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

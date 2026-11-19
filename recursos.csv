@@ -1,0 +1,7 @@
+codigo;tipo;titulo;destino
+u1-01;ejecuta;Python, NumPy, SciPy, NetworkX y Matplotlib;lab/notebooks/index.html?path=u1/modulos_python.ipynb
+u1-02;explora;Simulador de una competición: tabla pública y privada;recursos/u1/competicion.html
+u1-03;ejecuta;Un recomendador de películas con MovieLens (Colab);https://colab.research.google.com/github/especialidades-formativas/ifcd48/blob/main/contenido/colab/u1/recomendador.ipynb
+u1-04;ejecuta;MNIST: regresión logística y primera red en TensorFlow (Colab);https://colab.research.google.com/github/especialidades-formativas/ifcd48/blob/main/contenido/colab/u1/mnist_tensorflow.ipynb
+u1-05;explora;Dibuja un dígito: la regresión logística en el navegador;recursos/u1/dibuja.html
+u1-06;compruebalo;Test de autoevaluación de la Unidad 1;recursos/u1/test.html
