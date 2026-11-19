@@ -5,3 +5,6 @@ u1-03;ejecuta;Un recomendador de películas con MovieLens (Colab);https://colab.
 u1-04;ejecuta;MNIST: regresión logística y primera red en TensorFlow (Colab);https://colab.research.google.com/github/especialidades-formativas/ifcd48/blob/main/contenido/colab/u1/mnist_tensorflow.ipynb
 u1-05;explora;Dibuja un dígito: la regresión logística en el navegador;recursos/u1/dibuja.html
 u1-06;compruebalo;Test de autoevaluación de la Unidad 1;recursos/u1/test.html
+u2-01;explora;Entrena una red en el navegador: la espiral;recursos/u2/espiral.html
+u2-02;ejecuta;La neurona, sus activaciones y la retropropagación;lab/notebooks/index.html?path=u2/neurona_retro.ipynb
+u2-03;ejecuta;Del perceptrón a TensorFlow: entrenar, validar y probar (Colab);https://colab.research.google.com/github/especialidades-formativas/ifcd48/blob/main/contenido/colab/u2/entrenar_tensorflow.ipynb

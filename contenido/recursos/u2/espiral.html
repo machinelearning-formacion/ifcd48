@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U2-01 · Entrena una red en el navegador: la espiral · IFCD48</title>
+<link rel="stylesheet" href="../estilo.css">
+<style>
+.rej{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 22px;margin:8px 0}
+.rej label{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px;margin:0}
+.rej select{min-width:110px}
+.res{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+.res div{background:#EEF4FA;padding:8px 14px;min-width:120px}
+.res b{display:block;font-size:22px;color:#1F5FA8;font-variant-numeric:tabular-nums}
+canvas{width:100%;max-width:420px;aspect-ratio:1;display:block;border:1px solid #ccc}
+.nota{font-size:14px;color:#555}
+</style>
+</head>
+<body>
+<header><div class="cod">IFCD48 · Unidad 2 · U2-01 · Explora</div>
+<h1>Entrena una red en el navegador: la espiral</h1></header>
+<main>
+<p>Es el problema del apartado 2.2: separar los dos brazos de una espiral (300 puntos de
+entrenamiento y otros 300, generados aparte, de prueba). La red tiene una capa oculta y se
+entrena aquí mismo con retropropagación y el optimizador Adam. Elige el número de neuronas,
+la activación y la tasa de aprendizaje, pulsa <em>Entrenar</em> y mira cómo se curva la
+frontera.</p>
+<div class="rej">
+<label>Neuronas ocultas <select id="n"><option>2</option><option>4</option><option selected>8</option><option>16</option><option>64</option></select></label>
+<label>Activación <select id="f"><option value="tanh" selected>tanh</option><option value="relu">ReLU</option><option value="sig">sigmoide</option></select></label>
+<label>Tasa de aprendizaje <select id="lr"><option>0.001</option><option selected>0.01</option><option>0.1</option><option>1</option></select></label>
+<label>Ruido de los datos <select id="ru"><option>0.1</option><option selected>0.25</option><option>0.5</option></select></label>
+</div>
+<p><button type="button" id="ent">Entrenar</button> <button type="button" id="par">Parar</button>
+<button type="button" id="rei">Pesos nuevos</button>
+<label style="font-size:15px"><input type="checkbox" id="vp"> ver los puntos de prueba</label></p>
+<div class="res">
+<div>Paso<b id="pa">0</b></div>
+<div>Pérdida<b id="pe">–</b></div>
+<div>Entrenamiento<b id="ae">–</b></div>
+<div>Prueba<b id="ap">–</b></div>
+</div>
+<canvas id="c" width="400" height="400"></canvas>
+<p class="nota">Prueba: con 2 neuronas la frontera no da para más; con 64 llega al 100&nbsp;% en
+entrenamiento, pero ¿también en prueba? Sube la tasa a 1 y mira la pérdida. Con ReLU la
+frontera está hecha de tramos rectos. Los números no coincidirán exactamente con los del libro,
+porque los datos y los pesos se generan con otro generador aleatorio.</p>
+</main>
+<footer>Recurso complementario del libro <em>Programación de Redes Neuronales - Machine Learning</em> (IFCD48).</footer>
+<script>
+const $=id=>document.getElementById(id);
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function normal(r){return Math.sqrt(-2*Math.log(1-r()))*Math.cos(2*Math.PI*r())}
+function espiral(n,ruido,sem){const r=rng(sem),X=[],y=[];for(let i=0;i<n;i++){const t=Math.sqrt(r())*3*Math.PI,c=r()<.5?0:1,s=c?t:-t;
+ X.push([s*Math.cos(t)/3+ruido*normal(r),s*Math.sin(t)/3+ruido*normal(r)]);y.push(c)}return{X,y}}
+const act={tanh:[Math.tanh,a=>1-a*a],relu:[z=>z>0?z:0,a=>a>0?1:0],sig:[z=>1/(1+Math.exp(-z)),a=>a*(1-a)]};
+let D,T,P,M,V,paso=0,corre=false,semP=1;
+function datos(){const ru=+$('ru').value;D=espiral(300,ru,11);T=espiral(300,ru,22)}
+function pesos(){const n=+$('n').value,r=rng(semP++),f=$('f').value,e=f==='relu'?Math.sqrt(2/2):1;
+ P={W1:Array.from({length:2*n},()=>normal(r)*e),b1:new Array(n).fill(0),W2:Array.from({length:n},()=>normal(r)/Math.sqrt(n)),b2:[0]};
+ M={};V={};for(const k in P){M[k]=P[k].map(()=>0);V[k]=P[k].map(()=>0)}paso=0}
+function adelante(x,n,g){const h=new Array(n);let z=P.b2[0];for(let j=0;j<n;j++){h[j]=g(x[0]*P.W1[j]+x[1]*P.W1[n+j]+P.b1[j]);z+=h[j]*P.W2[j]}return[h,1/(1+Math.exp(-z))]}
+function epoca(){const n=P.b1.length,[g,dg]=act[$('f').value],lr=+$('lr').value,N=D.X.length;
+ const G={W1:new Array(2*n).fill(0),b1:new Array(n).fill(0),W2:new Array(n).fill(0),b2:[0]};let L=0;
+ for(let i=0;i<N;i++){const x=D.X[i],y=D.y[i],[h,p]=adelante(x,n,g),q=Math.min(Math.max(p,1e-7),1-1e-7);
+  L-=y*Math.log(q)+(1-y)*Math.log(1-q);const d2=(p-y)/N;G.b2[0]+=d2;
+  for(let j=0;j<n;j++){G.W2[j]+=h[j]*d2;const d1=d2*P.W2[j]*dg(h[j]);G.b1[j]+=d1;G.W1[j]+=x[0]*d1;G.W1[n+j]+=x[1]*d1}}
+ paso++;const b1=.9,b2=.999,c1=1-b1**paso,c2=1-b2**paso;
+ for(const k in P)for(let i=0;i<P[k].length;i++){const gg=G[k][i];M[k][i]=b1*M[k][i]+(1-b1)*gg;V[k][i]=b2*V[k][i]+(1-b2)*gg*gg;
+  P[k][i]-=lr*(M[k][i]/c1)/(Math.sqrt(V[k][i]/c2)+1e-8)}return L/N}
+function acierto(S){const n=P.b1.length,g=act[$('f').value][0];let a=0;S.X.forEach((x,i)=>{a+=(adelante(x,n,g)[1]>.5)===(S.y[i]===1)});return a/S.X.length}
+const cv=$('c'),cx=cv.getContext('2d'),R=3.5,px=v=>(v+R)/(2*R)*400;
+function dibuja(){const n=P.b1.length,g=act[$('f').value][0],s=8;
+ for(let i=0;i<400;i+=s)for(let j=0;j<400;j+=s){const x=[(i+s/2)/400*2*R-R,R-(j+s/2)/400*2*R],p=adelante(x,n,g)[1];
+  cx.fillStyle=p>.5?'#F6DDBB':'#CFE0F2';cx.fillRect(i,j,s,s)}
+ const S=$('vp').checked?T:D;S.X.forEach((x,i)=>{cx.beginPath();cx.arc(px(x[0]),400-px(x[1]),2.6,0,7);
+  cx.fillStyle=S.y[i]?'#E08A1E':'#1F5FA8';cx.fill()})}
+function marcador(L){$('pa').textContent=paso;$('pe').textContent=L===undefined?'–':(isFinite(L)?L.toFixed(3):'∞');
+ $('ae').textContent=(100*acierto(D)).toFixed(1)+' %';$('ap').textContent=(100*acierto(T)).toFixed(1)+' %'}
+function bucle(){if(!corre)return;let L;for(let k=0;k<20;k++)L=epoca();marcador(L);dibuja();if(paso>=5000)corre=false;else requestAnimationFrame(bucle)}
+$('ent').onclick=()=>{if(!corre){corre=true;bucle()}};
+$('par').onclick=()=>corre=false;
+$('rei').onclick=()=>{corre=false;pesos();marcador();dibuja()};
+['n','f'].forEach(k=>$(k).onchange=$('rei').onclick);
+$('ru').onchange=()=>{corre=false;datos();pesos();marcador();dibuja()};
+$('vp').onchange=dibuja;
+datos();pesos();marcador();dibuja();
+</script>
+</body>
+</html>
