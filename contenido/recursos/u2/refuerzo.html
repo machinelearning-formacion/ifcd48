@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U2-06 · Un agente que aprende por refuerzo · IFCD48</title>
+<link rel="stylesheet" href="../estilo.css">
+<style>
+.zona{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin:10px 0}
+#rej{display:grid;grid-template-columns:repeat(5,56px);grid-auto-rows:56px;gap:3px}
+#rej div{display:flex;align-items:center;justify-content:center;font-size:26px;border:1px solid #CFE0F2;cursor:pointer;user-select:none}
+#rej .meta{background:#1F5FA8;color:#fff;font-size:15px;font-weight:700}
+#rej .trampa{background:#C83232;color:#fff;font-size:15px;font-weight:700}
+#rej .ag{outline:3px solid #E08A1E;outline-offset:-3px}
+.res{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+.res div{background:#EEF4FA;padding:8px 14px;min-width:120px}
+.res b{display:block;font-size:22px;color:#1F5FA8;font-variant-numeric:tabular-nums}
+svg{width:100%;max-width:420px;height:auto;display:block}
+.nota{font-size:14px;color:#555}
+</style>
+</head>
+<body>
+<header><div class="cod">IFCD48 · Unidad 2 · U2-06 · Explora</div>
+<h1>Un agente que aprende por refuerzo</h1></header>
+<main>
+<p>Es el ejemplo del apartado 2.9. El agente sale de la esquina superior izquierda y debe llegar a
+la meta (M). Cada paso le cuesta 1 punto; llegar a la meta le da 10, y caer en una trampa (X) le
+quita 10 y termina el episodio. Nadie le dice el camino: una pequeña red neuronal estima el valor
+de cada movimiento en cada casilla y lo corrige con la experiencia. Las flechas muestran el
+movimiento que hoy considera mejor y el color, cuánto espera ganar desde esa casilla.
+Haz clic en una casilla para poner o quitar una trampa.</p>
+<p><button type="button" id="e1">1 episodio</button> <button type="button" id="e50">50 episodios</button>
+<button type="button" id="ver">Ver el camino aprendido</button> <button type="button" id="rei">Empezar de cero</button></p>
+<div class="zona">
+<div id="rej"></div>
+<div>
+<div class="res">
+<div>Episodios<b id="ne">0</b></div>
+<div>Exploración<b id="ex">100 %</b></div>
+<div>Pasos del último<b id="up">–</b></div>
+</div>
+<svg id="graf" viewBox="0 0 420 160"></svg>
+<p class="nota">Pasos por episodio (media de los últimos 20).</p>
+</div>
+</div>
+<p class="nota">Al principio el agente se mueve casi al azar; la exploración baja poco a poco hasta el
+5 %. Hacia el episodio 300 suele recorrer el camino más corto. Pon trampas que corten el camino
+directo y observa cómo encuentra un rodeo. Los números no coinciden con los del libro porque el
+generador aleatorio es otro.</p>
+</main>
+<footer>Recurso complementario del libro <em>Programación de Redes Neuronales - Machine Learning</em> (IFCD48).</footer>
+<script>
+const $=id=>document.getElementById(id),N=5,MOV=[[-1,0],[1,0],[0,-1],[0,1]],FL="↑↓←→";
+let META=[4,4],trampas=new Set(['2,2']),W1,W2,ep,pasos,rng,agente=null;
+function mk(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function nrm(){return Math.sqrt(-2*Math.log(1-rng()))*Math.cos(2*Math.PI*rng())}
+function inicia(){rng=mk(7);W1=Array.from({length:N*N},()=>Array.from({length:32},()=>0.1*nrm()));
+ W2=Array.from({length:32},()=>Array.from({length:4},()=>0.1*nrm()));ep=0;pasos=[];agente=null;pinta()}
+function q(s){const i=s[0]*N+s[1],h=W1[i].map(Math.tanh),o=[0,0,0,0];for(let j=0;j<32;j++)for(let a=0;a<4;a++)o[a]+=h[j]*W2[j][a];return[h,o]}
+function paso(s,a){const f=Math.min(Math.max(s[0]+MOV[a][0],0),N-1),c=Math.min(Math.max(s[1]+MOV[a][1],0),N-1);
+ if(f===META[0]&&c===META[1])return[[f,c],10,true];if(trampas.has(f+','+c))return[[f,c],-10,true];return[[f,c],-1,false]}
+const amax=v=>v.indexOf(Math.max(...v));
+function episodio(){ep++;const eps=Math.max(0.05,1-ep/300);let s=[0,0],fin=false,n=0;
+ while(!fin&&n<100){const[h,qs]=q(s);const a=rng()<eps?Math.floor(rng()*4):amax(qs);const[s2,r,f]=paso(s,a);
+  const obj=r+(f?0:0.9*Math.max(...q(s2)[1])),d=qs[a]-obj,i=s[0]*N+s[1];
+  for(let j=0;j<32;j++){const g1=W2[j][a]*d*(1-h[j]*h[j]);W2[j][a]-=0.05*h[j]*d;W1[i][j]-=0.05*g1}
+  s=s2;fin=f;n++}pasos.push(n)}
+function pinta(){const R=$('rej');R.innerHTML='';let vs=[];
+ for(let f=0;f<N;f++)for(let c=0;c<N;c++)vs.push(Math.max(...q([f,c])[1]));const lo=Math.min(...vs),hi=Math.max(...vs);
+ for(let f=0;f<N;f++)for(let c=0;c<N;c++){const d=document.createElement('div'),k=f+','+c;
+  if(f===META[0]&&c===META[1]){d.className='meta';d.textContent='M'}
+  else if(trampas.has(k)){d.className='trampa';d.textContent='X'}
+  else{const v=(vs[f*N+c]-lo)/((hi-lo)||1);d.style.background=`rgba(31,95,168,${(0.08+0.5*v).toFixed(2)})`;d.textContent=FL[amax(q([f,c])[1])];
+   d.onclick=()=>{if(f||c){trampas.add(k);pinta()}}}
+  if(trampas.has(k))d.onclick=()=>{trampas.delete(k);pinta()};
+  if(agente&&agente[0]===f&&agente[1]===c)d.classList.add('ag');R.appendChild(d)}
+ $('ne').textContent=ep;$('ex').textContent=Math.round(100*Math.max(0.05,1-ep/300))+' %';$('up').textContent=pasos.length?pasos[pasos.length-1]:'–';
+ const g=$('graf');if(!pasos.length){g.innerHTML='';return}const m=pasos.map((_,i)=>{const a=pasos.slice(Math.max(0,i-19),i+1);return a.reduce((x,y)=>x+y,0)/a.length});
+ const X=i=>10+400*i/Math.max(1,m.length-1),Y=v=>150-140*Math.min(v,100)/100;
+ g.innerHTML=`<line x1="10" y1="150" x2="410" y2="150" stroke="#9AA5B1"/><line x1="10" y1="${Y(8)}" x2="410" y2="${Y(8)}" stroke="#E08A1E" stroke-dasharray="4 3"/><text x="412" y="${Y(8)-3}" font-size="11" text-anchor="end" fill="#E08A1E">8 pasos</text><polyline fill="none" stroke="#1F5FA8" stroke-width="2" points="${m.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ')}"/>`}
+$('e1').onclick=()=>{episodio();pinta()};
+$('e50').onclick=()=>{for(let i=0;i<50;i++)episodio();pinta()};
+$('rei').onclick=inicia;
+$('ver').onclick=()=>{let s=[0,0],n=0,fin=false;const t=setInterval(()=>{agente=s;pinta();if(fin||n>=30){clearInterval(t);setTimeout(()=>{agente=null;pinta()},600);return}
+ [s,,fin]=paso(s,amax(q(s)[1]));n++},250)};
+inicia();
+</script>
+</body>
+</html>

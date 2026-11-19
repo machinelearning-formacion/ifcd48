@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U2-04 · Filtros de convolución en el navegador · IFCD48</title>
+<link rel="stylesheet" href="../estilo.css">
+<style>
+.zona{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;margin:10px 0}
+.zona figure{margin:0;text-align:center;font-size:14px}
+canvas{border:1px solid #9AA5B1;width:196px;height:196px;image-rendering:pixelated;display:block}
+#img{cursor:crosshair;touch-action:none}
+.k{display:grid;grid-template-columns:repeat(3,58px);gap:4px;margin:6px 0}
+.k input{width:54px;text-align:center;font-size:15px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0;font-size:15px}
+.nota{font-size:14px;color:#555}
+</style>
+</head>
+<body>
+<header><div class="cod">IFCD48 · Unidad 2 · U2-04 · Explora</div>
+<h1>Filtros de convolución en el navegador</h1></header>
+<main>
+<p>Es la operación del apartado 2.7. Un filtro de 3 × 3 recorre la imagen y, en cada posición,
+multiplica sus nueve pesos por los nueve píxeles que cubre y los suma. El resultado es un
+<em>mapa de características</em>, que en azul marca donde la respuesta es positiva y en rojo
+donde es negativa. Elige una prenda de Fashion-MNIST o dibuja encima, cambia los pesos del filtro
+y mira qué destaca.</p>
+<div class="ctl">Imagen: <select id="sel"></select> <button type="button" id="borrar">En blanco</button>
+<span class="nota">(puedes dibujar sobre la imagen)</span></div>
+<div class="ctl">Filtro: <select id="pre">
+<option value="1,0,-1,2,0,-2,1,0,-1">bordes verticales (Sobel)</option>
+<option value="1,2,1,0,0,0,-1,-2,-1">bordes horizontales (Sobel)</option>
+<option value="0,-1,0,-1,4,-1,0,-1,0">contornos (laplaciano)</option>
+<option value="0.11,0.11,0.11,0.11,0.11,0.11,0.11,0.11,0.11">desenfoque (media)</option>
+<option value="0,-1,0,-1,5,-1,0,-1,0">enfoque</option>
+<option value="0,0,0,0,1,0,0,0,0">identidad</option>
+</select></div>
+<div class="k" id="k"></div>
+<div class="ctl"><label><input type="checkbox" id="relu"> aplicar ReLU</label>
+<label><input type="checkbox" id="pool"> aplicar max pooling 2 × 2</label></div>
+<div class="zona">
+<figure><canvas id="img" width="28" height="28"></canvas><figcaption>Imagen (28 × 28)</figcaption></figure>
+<figure><canvas id="sal" width="26" height="26"></canvas><figcaption id="tam">Mapa (26 × 26)</figcaption></figure>
+</div>
+<p class="nota">Prueba: con el botín, el filtro de bordes verticales marca los lados de la caña y el de
+bordes horizontales, la suela. Con ReLU solo quedan los valores positivos; con pooling el mapa se reduce
+a la mitad y conserva el máximo de cada bloque de 2 × 2. Una red convolucional no usa filtros
+elegidos a mano: aprende los suyos durante el entrenamiento.</p>
+</main>
+<footer>Recurso complementario del libro <em>Programación de Redes Neuronales - Machine Learning</em> (IFCD48). Imágenes: Fashion-MNIST (Zalando Research, licencia MIT).</footer>
+<script>
+const $=id=>document.getElementById(id);
+const nombres=["camiseta","pantalón","jersey","vestido","abrigo","sandalia","camisa","zapatilla","bolso","botín"];
+let muestras=[],img=new Float32Array(784);
+nombres.forEach((n,i)=>{const o=document.createElement('option');o.value=i;o.textContent=n;$('sel').appendChild(o)});
+$('sel').value=9;
+const K=$('k');for(let i=0;i<9;i++){const e=document.createElement('input');e.type='number';e.step='0.1';e.oninput=calcula;K.appendChild(e)}
+function preset(){const v=$('pre').value.split(',');[...K.children].forEach((e,i)=>e.value=v[i]);calcula()}
+$('pre').onchange=preset;$('relu').onchange=calcula;$('pool').onchange=calcula;
+$('sel').onchange=()=>{img=Float32Array.from(muestras[+$('sel').value],v=>v/255);calcula()};
+$('borrar').onclick=()=>{img=new Float32Array(784);calcula()};
+fetch('fashion_muestras.json').then(r=>r.json()).then(j=>{muestras=j;$('sel').onchange();preset()});
+function pinta(cv,m,n,col){const c=cv.getContext('2d');cv.width=n;cv.height=n;const d=c.createImageData(n,n);
+ let lim=0;if(col)for(const v of m)lim=Math.max(lim,Math.abs(v));lim=lim||1;
+ for(let i=0;i<n*n;i++){let r,g,b;if(!col){const v=255-Math.round(255*m[i]);r=g=b=v}
+  else{const t=m[i]/lim;if(t>=0){r=Math.round(255*(1-t)+31*t);g=Math.round(255*(1-t)+95*t);b=Math.round(255*(1-t)+168*t)}
+   else{const u=-t;r=Math.round(255*(1-u)+200*u);g=Math.round(255*(1-u)+40*u);b=Math.round(255*(1-u)+40*u)}}
+  d.data.set([r,g,b,255],i*4)}c.putImageData(d,0,0)}
+function calcula(){const w=[...K.children].map(e=>parseFloat(e.value)||0);let o=new Float32Array(26*26);
+ for(let i=0;i<26;i++)for(let j=0;j<26;j++){let s=0;for(let a=0;a<3;a++)for(let b=0;b<3;b++)s+=w[a*3+b]*img[(i+a)*28+j+b];o[i*26+j]=$('relu').checked?Math.max(s,0):s}
+ let n=26;if($('pool').checked){const p=new Float32Array(169);for(let i=0;i<13;i++)for(let j=0;j<13;j++)
+  p[i*13+j]=Math.max(o[(2*i)*26+2*j],o[(2*i)*26+2*j+1],o[(2*i+1)*26+2*j],o[(2*i+1)*26+2*j+1]);o=p;n=13}
+ pinta($('img'),img,28,false);pinta($('sal'),o,n,true);$('tam').textContent=`Mapa (${n} × ${n})`}
+let dib=false;const L=$('img');
+function pon(e){const r=L.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)*28/r.width),y=Math.floor((e.clientY-r.top)*28/r.height);
+ for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const xx=x+b,yy=y+a;if(xx>=0&&xx<28&&yy>=0&&yy<28)img[yy*28+xx]=Math.min(1,img[yy*28+xx]+(a||b?0.35:1))}calcula()}
+L.addEventListener('pointerdown',e=>{dib=true;L.setPointerCapture(e.pointerId);pon(e)});
+L.addEventListener('pointermove',e=>{if(dib)pon(e)});L.addEventListener('pointerup',()=>dib=false);
+</script>
+</body>
+</html>
