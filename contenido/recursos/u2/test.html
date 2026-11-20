@@ -10,7 +10,7 @@
 <header><div class="cod">IFCD48 · Unidad 2 · U2-10 · Comprueba</div>
 <h1>Test de autoevaluación de la Unidad 2</h1></header>
 <main>
-<p>Doce preguntas sobre la unidad. Al corregir verás la explicación y el apartado del libro donde
+<p>Veintidós preguntas sobre la unidad. Al corregir verás la explicación y el apartado del libro donde
 repasarla. Tus respuestas no se guardan ni se envían a ningún sitio.</p>
 <form id="f"></form>
 <button type="button" id="b">Corregir</button>
@@ -54,7 +54,37 @@ const P=[
   e:"Concentró el 91,7 % de la atención en las dos posiciones marcadas y su error fue de 3,8·10⁻⁵, frente a 0,148 de la LSTM.",s:"2.11"},
  {q:"En el proyecto, ¿qué comprueba la prueba que compara la red de JavaScript con la de Keras?",
   o:["Que la página es bonita","Que los pesos se exportaron bien y que las capas se programaron igual: deben dar la misma respuesta","Que el usuario dibuja bien","Que la red tiene muchos parámetros"],c:1,
-  e:"Coincidieron en las 1000 imágenes, con una diferencia máxima de 9,6·10⁻⁶ en las probabilidades por el redondeo de los pesos.",s:"2.12"}
+  e:"Coincidieron en las 1000 imágenes, con una diferencia máxima de 9,6·10⁻⁶ en las probabilidades por el redondeo de los pesos.",s:"2.12"},
+ {q:"Con pesos iniciales de desviación 0,01, la señal en la capa 20 de una red de ReLU vale unos 10^-20. ¿Qué inicialización la mantiene?",
+  o:["Pesos a cero","La de He, con desviación raíz de 2/n, pensada para ReLU","Pesos todos iguales a 1","La misma 0,01 con más capas"],c:1,
+  e:"Con He la desviación se mantuvo cerca de 0,5 durante 20 capas.",s:"2.2.2"},
+ {q:"¿Por qué se usa la entropía cruzada y no el error cuadrático para clasificar con una sigmoide?",
+  o:["Porque es más rápida de calcular","Porque cuando la neurona está segura y equivocada el gradiente del error cuadrático casi desaparece, y el de la entropía cruzada no","Porque da valores entre 0 y 1","Porque no necesita etiquetas"],c:1,
+  e:"Con la entropía cruzada, la neurona que empezaba muy equivocada llegó al 95 % en 20 pasos; con el error cuadrático, en 182.",s:"2.2.3"},
+ {q:"En una red de diez capas de sigmoides, el gradiente de la primera capa es unas 200 000 veces menor que el de la última. ¿Qué consecuencia tiene?",
+  o:["Ninguna","Las primeras capas apenas aprenden mientras las últimas se ajustan","La red aprende más rápido","El gradiente explota"],c:1,
+  e:"Con ReLU, todas las capas recibieron gradientes entre 0,016 y 0,049. La normalización por lotes también rescató a la red de sigmoides.",s:"2.3.3"},
+ {q:"Con 30 000 prendas, la red acierta el 87,5 % en entrenamiento y el 86,2 % en validación. ¿Qué conviene hacer?",
+  o:["Conseguir muchos más datos","Cambiar el modelo (más capacidad, más épocas u otra arquitectura): no sobreajusta, le falta capacidad","Reducir los datos","Añadir dropout"],c:1,
+  e:"Cuando las dos curvas se juntan, más datos apenas ayudan.",s:"2.4.3"},
+ {q:"La misma red con cinco semillas distintas da validaciones con un rango de 0,51 puntos. ¿Qué implica para comparar dos configuraciones?",
+  o:["Nada","Que diferencias menores que esa variación no se pueden atribuir a la configuración con una sola ejecución","Que hay que usar siempre la semilla 0","Que la red está mal"],c:1,
+  e:"En la búsqueda aleatoria, la segunda mejor configuración quedaba a solo 0,36 puntos de la primera.",s:"2.4.6"},
+ {q:"Una red da una confianza media del 94,7 % y acierta el 87,6 %. ¿Qué hace el escalado por temperatura?",
+  o:["Mejora el acierto","Suaviza las probabilidades para que la confianza se ajuste al acierto real, sin cambiar ninguna predicción","Reentrena la red","Elimina la clase camisa"],c:1,
+  e:"Con T = 2,47 el error de calibración bajó de 0,071 a 0,021.",s:"2.6.4"},
+ {q:"Con solo 100 dígitos etiquetados, ¿qué aporta usar la base convolucional entrenada con 60 000 prendas?",
+  o:["Nada, son tareas distintas","Casi siete puntos de acierto: sus detectores de bordes y trazos sirven también para los dígitos","Empeora el resultado","Solo sirve con GPU"],c:1,
+  e:"Con 2000 dígitos la ventaja desaparece: la red aprende sus propios filtros.",s:"2.7.6"},
+ {q:"Los ocho grupos de puntos reales y una GAN cuyo generador nunca cubre más de dos y salta de una zona a otra. ¿Cómo se llama el fenómeno?",
+  o:["Sobreajuste","Colapso de modos","Gradiente que se desvanece","Calibración"],c:1,
+  e:"La GAN condicional lo evita en parte, porque se le piden todos los dígitos por igual.",s:"2.10.4"},
+ {q:"La red del proyecto acierta el 97,9 % con dígitos centrados y el 34,7 % desplazados seis píxeles. ¿Qué se deduce?",
+  o:["Que la red está rota","Que tolera desplazamientos pequeños pero no grandes, y la aplicación debe centrar y escalar el dibujo antes de clasificarlo","Que hay que usar una red densa","Que MNIST está mal"],c:1,
+  e:"Las pruebas de robustez dicen qué preparación necesita la entrada.",s:"2.12.4"},
+ {q:"¿Qué se ganó guardando los pesos de la red del proyecto en binario de 16 bits?",
+  o:["Más acierto","Un fichero diez veces menor que el JSON original sin cambiar ninguna de las 10 000 predicciones","Más velocidad de entrenamiento","Nada"],c:1,
+  e:"Al reducir la precisión hay que comprobar siempre que las predicciones no cambian.",s:"2.12.5"}
 ];
 P.forEach((p,i)=>{const k=(i*3+1)%4;p.o=[...p.o.slice(k),...p.o.slice(0,k)];p.c=(p.c-k+4)%4});  // reparte la respuesta correcta
 const f=document.getElementById('f');
