@@ -27,6 +27,8 @@ jobs:
           for nb in contenido/notebooks/*/*.ipynb contenido/colab/*/*.ipynb; do
             jupyter nbconvert --to notebook --execute --ExecutePreprocessor.kernel_name=python3 --stdout "$nb" > /dev/null
           done
+      - name: Pruebas de la aplicación del proyecto (apartado 2.12)
+        run: cd contenido/recursos/u2/app && python -m pytest -q test_app.py
       - name: Borrar los archivos que generan los notebooks al ejecutarse
         run: git clean -fdx contenido
       - name: Construir la web

@@ -16,3 +16,4 @@ pyarrow==26.0.1
 seaborn==0.13.2
 plotly==7.1.0
 networkx==3.7
+pytest==9.1.1

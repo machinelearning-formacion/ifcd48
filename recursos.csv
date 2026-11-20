@@ -11,3 +11,7 @@ u2-03;ejecuta;Del perceptrón a TensorFlow: entrenar, validar y probar (Colab);h
 u2-04;explora;Filtros de convolución en el navegador;recursos/u2/convolucion.html
 u2-05;ejecuta;Regularización, redes convolucionales, recurrentes y autocodificador (Colab);https://colab.research.google.com/github/especialidades-formativas/ifcd48/blob/main/contenido/colab/u2/cnn_rnn.ipynb
 u2-06;explora;Un agente que aprende por refuerzo;recursos/u2/refuerzo.html
+u2-07;explora;Una GAN que se entrena en el navegador;recursos/u2/gan.html
+u2-08;ejecuta;Redes generativas antagónicas y atención (Colab);https://colab.research.google.com/github/especialidades-formativas/ifcd48/blob/main/contenido/colab/u2/gan_atencion.ipynb
+u2-09;explora;Proyecto: reconocedor de dígitos con una red convolucional;recursos/u2/app/index.html
+u2-10;compruebalo;Test de autoevaluación de la Unidad 2;recursos/u2/test.html

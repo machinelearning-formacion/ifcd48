@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U2-10 · Test de autoevaluación · IFCD48</title>
+<link rel="stylesheet" href="../estilo.css">
+</head>
+<body>
+<header><div class="cod">IFCD48 · Unidad 2 · U2-10 · Comprueba</div>
+<h1>Test de autoevaluación de la Unidad 2</h1></header>
+<main>
+<p>Doce preguntas sobre la unidad. Al corregir verás la explicación y el apartado del libro donde
+repasarla. Tus respuestas no se guardan ni se envían a ningún sitio.</p>
+<form id="f"></form>
+<button type="button" id="b">Corregir</button>
+<p id="nota" class="res"></p>
+</main>
+<footer>Recurso complementario del libro <em>Programación de Redes Neuronales - Machine Learning</em> (IFCD48).</footer>
+<script>
+const P=[
+ {q:"Un perceptrón entrenado con el 3 y el 8 de MNIST sigue cometiendo unos 490 errores tras 50 épocas. ¿Por qué?",
+  o:["Le faltan épocas","Ningún plano separa todos los treses de todos los ochos, y una neurona sola solo traza fronteras planas","La tasa de aprendizaje es demasiado alta","MNIST tiene errores de etiquetado"],c:1,
+  e:"Con el 0 y el 1 converge en 7 épocas porque existe un plano que los separa; con el 3 y el 8 no existe.",s:"2.1"},
+ {q:"¿Por qué la ReLU sustituyó a la sigmoide en las capas ocultas de las redes profundas?",
+  o:["Porque es más fácil de escribir","Porque la derivada de la sigmoide vale como máximo 0,25 y, multiplicada capa a capa, la señal de error se desvanece","Porque la sigmoide no se puede derivar","Porque la ReLU da probabilidades"],c:1,
+  e:"Tras 10 capas de sigmoides la señal puede quedar en 0,25¹⁰ ≈ 10⁻⁶; la ReLU tiene derivada 1 para valores positivos.",s:"2.2"},
+ {q:"¿Cómo se comprueba que una implementación de la retropropagación es correcta?",
+  o:["Entrenando y mirando si baja la pérdida","Comparando sus derivadas con derivadas numéricas, moviendo cada peso un poco en los dos sentidos","Usando más neuronas","No hace falta comprobarla"],c:1,
+  e:"Es la comprobación del gradiente: las derivadas coincidieron en seis decimales. Un error en una derivada no siempre impide que la red funcione, pero hace que aprenda mal.",s:"2.3"},
+ {q:"Si todos los pesos de una red empiezan en cero, ¿qué ocurre?",
+  o:["Aprende más deprisa","Todas las neuronas de una capa calculan lo mismo, reciben el mismo gradiente y la red no aprende","Nada, los sesgos lo compensan","Se sobreajusta"],c:1,
+  e:"En Fashion-MNIST se quedó en el 9,6 % de acierto, como al azar; con la inicialización de He llegó al 87,9 %.",s:"2.4"},
+ {q:"¿Para qué sirve el conjunto de validación?",
+  o:["Para entrenar la red","Para elegir hiperparámetros y decidir cuándo parar, reservando la prueba para la evaluación final","Para sustituir al de prueba","Para aumentar los datos"],c:1,
+  e:"La parada temprana vigila la validación y recupera los pesos de la mejor época; la prueba se usa una sola vez al final.",s:"2.4"},
+ {q:"En la red densa del libro, el aumento de datos (voltear y desplazar las prendas) empeoró la validación. ¿Por qué?",
+  o:["Porque el aumento de datos nunca funciona","Porque una red densa trata cada píxel por separado y no sabe que una prenda desplazada es la misma prenda","Porque había demasiados datos","Porque el dropout lo anula"],c:1,
+  e:"Las técnicas de regularización no son recetas universales: hay que medirlas en validación.",s:"2.6"},
+ {q:"¿Qué ventaja principal tiene una capa convolucional frente a una densa en imágenes?",
+  o:["Que no necesita entrenarse","Que usa los mismos filtros pequeños en toda la imagen: aprovecha la estructura local con muchos menos pesos","Que no usa pesos","Que solo funciona con imágenes en color"],c:1,
+  e:"32 filtros de 3×3 son 320 pesos; 256 neuronas densas sobre 784 píxeles son 200 960. La red convolucional llegó al 90,9 % en Fashion-MNIST.",s:"2.7"},
+ {q:"En el problema de la suma con 100 pasos, la red recurrente simple no aprende y la LSTM sí. ¿Qué lo explica?",
+  o:["La LSTM tiene más épocas","La celda de memoria de la LSTM deja pasar la información y el gradiente a través de muchos pasos","La red simple no tiene pesos recurrentes","La LSTM no usa la retropropagación"],c:1,
+  e:"El error de la red simple (0,158) fue el mismo que respondiendo siempre 1; el de la LSTM, 0,011.",s:"2.8"},
+ {q:"¿Qué señal usa un agente que aprende por refuerzo?",
+  o:["La respuesta correcta de cada ejemplo","Las recompensas que recibe al actuar","Los datos sin etiquetas","El error de reconstrucción"],c:1,
+  e:"El agente de la cuadrícula aprendió el camino más corto (8 pasos) solo con recompensas: −1 por paso, +10 en la meta y −10 en la trampa.",s:"2.9"},
+ {q:"En una GAN, la pérdida del discriminador se estabiliza en 1,386 (2 ln 2). ¿Qué significa?",
+  o:["Que el entrenamiento ha fallado","Que el discriminador ya no distingue los ejemplos reales de los generados y responde 0,5","Que el generador ha colapsado","Que hay que parar el discriminador"],c:1,
+  e:"Es el equilibrio teórico. Aun así, conviene mirar los ejemplos: en el libro, cada pico generado era más estrecho que el real.",s:"2.10"},
+ {q:"¿Por qué la red con atención resolvió el problema de la suma con 150 pasos y la LSTM no?",
+  o:["Porque tenía más neuronas","Porque puede leer directamente cualquier posición de la secuencia, sin arrastrar la información paso a paso","Porque usa convoluciones","Porque se entrenó más tiempo"],c:1,
+  e:"Concentró el 91,7 % de la atención en las dos posiciones marcadas y su error fue de 3,8·10⁻⁵, frente a 0,148 de la LSTM.",s:"2.11"},
+ {q:"En el proyecto, ¿qué comprueba la prueba que compara la red de JavaScript con la de Keras?",
+  o:["Que la página es bonita","Que los pesos se exportaron bien y que las capas se programaron igual: deben dar la misma respuesta","Que el usuario dibuja bien","Que la red tiene muchos parámetros"],c:1,
+  e:"Coincidieron en las 1000 imágenes, con una diferencia máxima de 9,6·10⁻⁶ en las probabilidades por el redondeo de los pesos.",s:"2.12"}
+];
+P.forEach((p,i)=>{const k=(i*3+1)%4;p.o=[...p.o.slice(k),...p.o.slice(0,k)];p.c=(p.c-k+4)%4});  // reparte la respuesta correcta
+const f=document.getElementById('f');
+P.forEach((p,i)=>{const d=document.createElement('div');d.className='preg';
+ d.innerHTML='<p>'+(i+1)+'. '+p.q+'</p>'+p.o.map((o,j)=>'<label><input type="radio" name="p'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="fb" id="fb'+i+'"></div>';
+ f.append(d)});
+document.getElementById('b').onclick=()=>{let ok=0;
+ P.forEach((p,i)=>{const s=f.querySelector('input[name=p'+i+']:checked');const fb=document.getElementById('fb'+i);
+  const bien=s&&+s.value===p.c;if(bien)ok++;
+  fb.innerHTML=(bien?'<span class="ok">Correcto.</span> ':'<span class="mal">'+(s?'No es correcto.':'Sin responder.')+'</span> Respuesta: '+p.o[p.c]+'. ')+p.e+' <em>Repasa el apartado '+p.s+'.</em>'});
+ document.getElementById('nota').textContent='Aciertos: '+ok+' de '+P.length;};
+</script>
+</body>
+</html>
