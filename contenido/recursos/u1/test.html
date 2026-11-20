@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>U1-06 · Test de autoevaluación · IFCD48</title>
+<title>U1-07 · Test de autoevaluación · IFCD48</title>
 <link rel="stylesheet" href="../estilo.css">
 </head>
 <body>
-<header><div class="cod">IFCD48 · Unidad 1 · U1-06 · Comprueba</div>
+<header><div class="cod">IFCD48 · Unidad 1 · U1-07 · Comprueba</div>
 <h1>Test de autoevaluación de la Unidad 1</h1></header>
 <main>
-<p>Diez preguntas sobre la unidad. Al corregir verás la explicación y el apartado del libro donde
+<p>Dieciocho preguntas sobre la unidad. Al corregir verás la explicación y el apartado del libro donde
 repasarla. Tus respuestas no se guardan ni se envían a ningún sitio.</p>
 <form id="f"></form>
 <button type="button" id="b">Corregir</button>
@@ -21,16 +21,16 @@ repasarla. Tus respuestas no se guardan ni se envían a ningún sitio.</p>
 const P=[
  {q:"¿Por qué el código para redes neuronales se escribe con operaciones de NumPy sobre arrays en lugar de bucles?",
   o:["Porque los bucles dan resultados incorrectos","Porque una operación vectorial la ejecuta código compilado y es del orden de cien veces más rápida","Porque Python no tiene bucles","Porque NumPy usa menos decimales"],c:1,
-  e:"Sumar un millón de cuadrados tardó unos 65 ms con un bucle y menos de 1 ms con np.dot.",s:"1.1.3"},
+  e:"Sumar un millón de cuadrados tardó unos 65 ms con un bucle y menos de 1 ms con np.dot.",s:"1.1.7"},
  {q:"Dos cálculos de la misma suma dan 333332833333500000 y 333332833333499968. ¿Qué haces?",
   o:["Buscar el error en el código","Compararlos con una tolerancia (np.isclose): el redondeo de los decimales cambia los últimos dígitos","Usar siempre bucles","Pasar a enteros de 8 bits"],c:1,
-  e:"La diferencia relativa fue de una billonésima: los resultados con decimales se comparan con tolerancia, nunca con ==.",s:"1.1.3"},
+  e:"La diferencia relativa fue de una billonésima: los resultados con decimales se comparan con tolerancia, nunca con ==.",s:"1.1.7"},
  {q:"¿Qué hace una capa densa de una red sobre un lote de imágenes?",
   o:["Ordena las imágenes","Un producto de matrices más un sesgo, seguido de una función de activación","Cuenta los píxeles con tinta","Reduce la resolución de las imágenes"],c:1,
   e:"H = ReLU(X W + b): con X de 32×784 y W de 784×128 se calculan las 128 neuronas para las 32 imágenes a la vez.",s:"1.2.1"},
  {q:"¿Cuántos parámetros tiene una red 784-128-10 con capas densas?",
   o:["922","100 480","101 770","7850"],c:2,
-  e:"784×128 + 128×10 = 101 632 pesos, más 128 + 10 = 138 sesgos.",s:"1.2.3"},
+  e:"784×128 + 128×10 = 101 632 pesos, más 128 + 10 = 138 sesgos.",s:"1.2.7"},
  {q:"¿Qué tipo de aprendizaje es agrupar a los clientes de una tienda sin grupos definidos de antemano?",
   o:["Supervisado","No supervisado","Por refuerzo","Regresión"],c:1,
   e:"No hay respuestas correctas que aprender: el objetivo es descubrir estructura. Con MNIST, k-medias encontró grupos con sentido que no coinciden con los dígitos.",s:"1.4"},
@@ -39,7 +39,7 @@ const P=[
   e:"Todos acertaban el 80 % y la tabla pública los separó entre el 77,7 % y el 83,1 % solo por azar. Por eso el conjunto de prueba se usa una sola vez.",s:"1.5.1"},
  {q:"Al pasar de 1000 a 60 000 imágenes de entrenamiento, ¿qué modelo mejora más?",
   o:["La regresión logística","La red con una capa oculta","Los dos igual","Ninguno"],c:1,
-  e:"La logística sube 6 puntos (al 92,6 %); la red, 11 (al 97,6 %). Un modelo con más capacidad necesita más datos y los aprovecha.",s:"1.5.2"},
+  e:"La logística sube 6 puntos (al 92,6 %); la red, 11 (al 97,6 %). Un modelo con más capacidad necesita más datos y los aprovecha.",s:"1.5.3"},
  {q:"¿Por qué conviene construir primero una regresión logística sobre MNIST?",
   o:["Porque siempre es mejor que una red","Porque es un modelo de referencia sencillo e interpretable: una red solo se justifica si lo supera","Porque TensorFlow la necesita","Porque no tiene parámetros"],c:1,
   e:"Acierta el 92,6 % con 7850 parámetros; la red de 128 neuronas ocultas llega al 97,4 %.",s:"1.7"},
@@ -48,8 +48,33 @@ const P=[
   e:"El RMSE baja de 1,126 a 0,939 con los sesgos; los 20 factores lo bajan solo a 0,927.",s:"1.8"},
  {q:"Durante el entrenamiento, el acierto en entrenamiento sigue subiendo y el de validación se estanca. ¿Qué indica?",
   o:["Que la red funciona perfectamente","El comienzo del sobreajuste: la red empieza a memorizar los ejemplos","Que hay pocas épocas","Que la tasa de aprendizaje es cero"],c:1,
-  e:"En la quinta época, 98,7 % en entrenamiento frente a 97,5 % en validación, estancada desde la tercera.",s:"1.10"}
+  e:"En la quinta época, 98,7 % en entrenamiento frente a 97,5 % en validación, estancada desde la tercera.",s:"1.10"},
+ {q:"Una columna tiene 999 valores entre 30 y 70 y uno de 10 000. ¿Qué estandarización conviene?",
+  o:["Restar la media y dividir por la desviación típica","Usar la mediana y el rango intercuartílico, que el valor atípico apenas cambia","No estandarizar nunca","Dividir por el máximo"],c:1,
+  e:"Con la media y la desviación, la mediana de |z| quedó en 0,03; con la versión robusta, en 0,5.",s:"1.1.4"},
+ {q:"¿Por qué la softmax se calcula restando primero la puntuación máxima?",
+  o:["Para que sea más rápida","Porque e elevado a un número grande desborda la coma flotante y el resultado sería nan; restar el máximo no cambia las probabilidades","Para que sumen 1","Porque lo exige Keras"],c:1,
+  e:"exp(709) es representable, exp(710) ya es infinito.",s:"1.2.2"},
+ {q:"Una red acierta el 97,41 % de 10 000 imágenes de prueba. ¿Qué dice su intervalo de confianza del 95 %?",
+  o:["Que el acierto real es exactamente 97,41 %","Que con otras imágenes de la misma procedencia el acierto estaría probablemente entre 97,08 % y 97,71 %","Que la red falla un 5 %","Nada útil"],c:1,
+  e:"Con 1000 imágenes el margen sería de unos dos puntos; para bajarlo a dos décimas harían falta 100 000.",s:"1.2.5"},
+ {q:"Un polinomio de grado 12 tiene un error de entrenamiento de 0,003 y de prueba de más de 5000. ¿Qué ocurre?",
+  o:["Subajuste","Sobreajuste: se ajusta al ruido de los 15 puntos y oscila entre ellos","Falta de datos de prueba","Un error de programación"],c:1,
+  e:"Los grados 3 a 5 se quedaron cerca de 0,04, el límite que impone el ruido.",s:"1.3.3"},
+ {q:"Con 100 imágenes etiquetadas y 9900 sin etiquetar, el autoentrenamiento sube el acierto del 72,4 % al 78,3 %. ¿Por qué no llega al 90,4 % de usar 10 000 etiquetas?",
+  o:["Porque el modelo es demasiado simple","Porque solo el 84,7 % de las etiquetas que se pone el modelo son correctas, y aprende también de sus errores","Porque faltan épocas","Porque PCA pierde información"],c:1,
+  e:"Las imágenes sin etiqueta ayudan, pero no sustituyen a las etiquetas.",s:"1.4.1"},
+ {q:"¿Qué permite entrenar con datos que no caben en memoria?",
+  o:["Comprimir las imágenes","Leer los datos por bloques (por ejemplo con mapeo en memoria) y usar un algoritmo que aprenda bloque a bloque, como el descenso de gradiente estocástico","Usar solo una parte de los datos","Usar float64"],c:1,
+  e:"Cada bloque de 5000 imágenes ocupó 15,7 MB frente a 188 MB del conjunto completo.",s:"1.5.4"},
+ {q:"Recomendar las películas más vistas logra una precisión@10 de 0,138 y el filtrado por vecinos, de 0,142. ¿Qué se concluye?",
+  o:["Que el algoritmo de vecinos está mal","Que la popularidad es una referencia muy difícil de superar en las primeras posiciones y que la evaluación debe medir lo que hará el sistema","Que la precisión@10 no sirve","Que hay que recomendar al azar"],c:1,
+  e:"Un modelo optimizado para el error de las notas no tiene por qué ser el mejor para ordenar una lista.",s:"1.8.4"},
+ {q:"La red está segura al 99 % o más en el 84,8 % de las imágenes y ahí acierta el 99,76 %. ¿Cómo se aprovecha?",
+  o:["No se puede aprovechar","Aceptando automáticamente las predicciones seguras y enviando las demás a revisión humana","Subiendo el umbral a 100 %","Entrenando más épocas"],c:1,
+  e:"En el resto de imágenes acertó solo el 85,9 %; aun así, también hay errores entre las seguras.",s:"1.10.1"}
 ];
+P.forEach((p,i)=>{const k=(i*3+1)%4;p.o=[...p.o.slice(k),...p.o.slice(0,k)];p.c=(p.c-k+4)%4});  // reparte la respuesta correcta
 const f=document.getElementById('f');
 P.forEach((p,i)=>{const d=document.createElement('div');d.className='preg';
  d.innerHTML='<p>'+(i+1)+'. '+p.q+'</p>'+p.o.map((o,j)=>'<label><input type="radio" name="p'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="fb" id="fb'+i+'"></div>';
