@@ -11,4 +11,4 @@ libro lleva a uno de estos recursos:
 La tabla `recursos.csv` es la fuente única: `herramientas/construir.py` genera la web y el
 bloque de recursos del libro.
 
-Web publicada: <https://especialidades-formativas.github.io/ifcd48/>
+Web publicada: <https://machinelearning-formacion.github.io/ifcd48/>
