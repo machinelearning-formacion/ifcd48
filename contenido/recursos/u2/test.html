@@ -10,7 +10,7 @@
 <header><div class="cod">IFCD48 · Unidad 2 · U2-10 · Comprueba</div>
 <h1>Test de autoevaluación de la Unidad 2</h1></header>
 <main>
-<p>Veintidós preguntas sobre la unidad. Al corregir verás la explicación y el apartado del libro donde
+<p>Veintidós preguntas sobre la unidad. Al corregir verás la explicación y el apartado de la unidad donde
 repasarla. Tus respuestas no se guardan ni se envían a ningún sitio.</p>
 <form id="f"></form>
 <button type="button" id="b">Corregir</button>
@@ -34,7 +34,7 @@ const P=[
  {q:"¿Para qué sirve el conjunto de validación?",
   o:["Para entrenar la red","Para elegir hiperparámetros y decidir cuándo parar, reservando la prueba para la evaluación final","Para sustituir al de prueba","Para aumentar los datos"],c:1,
   e:"La parada temprana vigila la validación y recupera los pesos de la mejor época; la prueba se usa una sola vez al final.",s:"2.4"},
- {q:"En la red densa del libro, el aumento de datos (voltear y desplazar las prendas) empeoró la validación. ¿Por qué?",
+ {q:"En la red densa de la Unidad 2, el aumento de datos (voltear y desplazar las prendas) empeoró la validación. ¿Por qué?",
   o:["Porque el aumento de datos nunca funciona","Porque una red densa trata cada píxel por separado y no sabe que una prenda desplazada es la misma prenda","Porque había demasiados datos","Porque el dropout lo anula"],c:1,
   e:"Las técnicas de regularización no son recetas universales: hay que medirlas en validación.",s:"2.6"},
  {q:"¿Qué ventaja principal tiene una capa convolucional frente a una densa en imágenes?",
@@ -48,7 +48,7 @@ const P=[
   e:"El agente de la cuadrícula aprendió el camino más corto (8 pasos) solo con recompensas: −1 por paso, +10 en la meta y −10 en la trampa.",s:"2.9"},
  {q:"En una GAN, la pérdida del discriminador se estabiliza en 1,386 (2 ln 2). ¿Qué significa?",
   o:["Que el entrenamiento ha fallado","Que el discriminador ya no distingue los ejemplos reales de los generados y responde 0,5","Que el generador ha colapsado","Que hay que parar el discriminador"],c:1,
-  e:"Es el equilibrio teórico. Aun así, conviene mirar los ejemplos: en el libro, cada pico generado era más estrecho que el real.",s:"2.10"},
+  e:"Es el equilibrio teórico. Aun así, conviene mirar los ejemplos: en la Unidad 2, cada pico generado era más estrecho que el real.",s:"2.10"},
  {q:"¿Por qué la red con atención resolvió el problema de la suma con 150 pasos y la LSTM no?",
   o:["Porque tenía más neuronas","Porque puede leer directamente cualquier posición de la secuencia, sin arrastrar la información paso a paso","Porque usa convoluciones","Porque se entrenó más tiempo"],c:1,
   e:"Concentró el 91,7 % de la atención en las dos posiciones marcadas y su error fue de 3,8·10⁻⁵, frente a 0,148 de la LSTM.",s:"2.11"},
